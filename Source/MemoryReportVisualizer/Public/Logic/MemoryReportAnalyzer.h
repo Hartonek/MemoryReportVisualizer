@@ -6,6 +6,7 @@
 #include "HAL/Platform.h"
 #include "MemoryReportSectionData.h"
 #include "MemoryReportConfigMemSectionData.h"
+#include "MemoryReportResourceSizeSortSectionData.h"
 
 class MEMORYREPORTVISUALIZER_API MemoryReportAnalyzer
 {

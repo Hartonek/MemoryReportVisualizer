@@ -140,6 +140,12 @@ void SMemoryReportFileVisualizerWidget::Construct(const FArguments& InArgs)
 					SAssignNew(ConfigMemWidget, SMemoryReportConfigMemWidget)
 					.Visibility(EVisibility::Collapsed)
 				]
+				+ SScrollBox::Slot()
+				.Padding(5)
+				[
+					SAssignNew(ResourceSizeSortWidget, SMemoryReportResourceSizeSortWidget)
+					.Visibility(EVisibility::Collapsed)
+				]
 			]
 		]
 	];
@@ -434,6 +440,10 @@ void SMemoryReportFileVisualizerWidget::UpdateContentDisplay()
 	{
 		ConfigMemWidget->SetVisibility(EVisibility::Collapsed);
 	}
+	if (ResourceSizeSortWidget.IsValid())
+	{
+		ResourceSizeSortWidget->SetVisibility(EVisibility::Collapsed);
+	}
 	
 	FString ContentToDisplay;
 	bool bUseSpecializedWidget = false;
@@ -468,10 +478,25 @@ void SMemoryReportFileVisualizerWidget::UpdateContentDisplay()
 						bUseSpecializedWidget = true;
 					}
 				}
+				// Check if this is a ResourceSizeSort section
 				else
 				{
-					// Use regular text display
-					ContentToDisplay = Section->Content;
+					TSharedPtr<ResourceSizeSortSectionData> ResourceSizeSortSection = StaticCastSharedPtr<ResourceSizeSortSectionData>(Section);
+					if (ResourceSizeSortSection.IsValid() && *SelectedSection == TEXT("obj list -resourcesizesort"))
+					{
+						// Use specialized ResourceSizeSort widget
+						if (ResourceSizeSortWidget.IsValid())
+						{
+							ResourceSizeSortWidget->Populate(ResourceSizeSortSection);
+							ResourceSizeSortWidget->SetVisibility(EVisibility::Visible);
+							bUseSpecializedWidget = true;
+						}
+					}
+					else
+					{
+						// Use regular text display
+						ContentToDisplay = Section->Content;
+					}
 				}
 				break;
 			}

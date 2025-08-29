@@ -2,6 +2,7 @@
 
 #include "Logic/MemoryReportAnalyzer.h"
 #include "Logic/MemoryReportConfigMemSectionData.h"
+#include "Logic/MemoryReportResourceSizeSortSectionData.h"
 #include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
 
@@ -153,6 +154,15 @@ TSharedPtr<SectionData> MemoryReportAnalyzer::CreateSpecializedSection(const FSt
 		Section = ConfigMemSection;
 		
 		UE_LOG(LogTemp, Log, TEXT("Created specialized ConfigMem section with %d entries"), ConfigMemSection->ConfigMemEntries.Num());
+	}
+	else if (InternalSectionID == TEXT("obj list -resourcesizesort"))
+	{
+		// Create ResourceSizeSort specialized section
+		TSharedPtr<ResourceSizeSortSectionData> ResourceSizeSortSection = MakeShareable(new ResourceSizeSortSectionData(InternalSectionID, SectionContent));
+		ResourceSizeSortSection->ExtractContentInternally();
+		Section = ResourceSizeSortSection;
+		
+		UE_LOG(LogTemp, Log, TEXT("Created specialized ResourceSizeSort section with %d entries"), ResourceSizeSortSection->ResourceSizeSortEntries.Num());
 	}
 	else
 	{
