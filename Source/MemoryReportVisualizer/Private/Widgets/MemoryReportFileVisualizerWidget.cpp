@@ -387,12 +387,12 @@ void SMemoryReportFileVisualizerWidget::PopulateSectionDropdown()
 	}
 	
 	// Add each section ID (only if section has content)
-	const TArray<SectionData>& Sections = Analyzer.GetSections();
-	for (const SectionData& Section : Sections)
+	const TArray<TSharedPtr<SectionData>>& Sections = Analyzer.GetSections();
+	for (const TSharedPtr<SectionData>& Section : Sections)
 	{
-		if (!Section.ID.IsEmpty() && !Section.Content.IsEmpty())
+		if (Section.IsValid() && !Section->ID.IsEmpty() && !Section->Content.IsEmpty())
 		{
-			SectionOptions.Add(MakeShareable(new FString(Section.ID)));
+			SectionOptions.Add(MakeShareable(new FString(Section->ID)));
 		}
 	}
 	
@@ -438,12 +438,12 @@ void SMemoryReportFileVisualizerWidget::UpdateContentDisplay()
 	else
 	{
 		// Find and display the specific section
-		const TArray<SectionData>& Sections = Analyzer.GetSections();
-		for (const SectionData& Section : Sections)
+		const TArray<TSharedPtr<SectionData>>& Sections = Analyzer.GetSections();
+		for (const TSharedPtr<SectionData>& Section : Sections)
 		{
-			if (Section.ID == *SelectedSection)
+			if (Section.IsValid() && Section->ID == *SelectedSection)
 			{
-				ContentToDisplay = Section.Content;
+				ContentToDisplay = Section->Content;
 				break;
 			}
 		}

@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Logic/MemoryReportAnalyzer.h"
+#include "Logic/MemoryReportConfigMemSectionData.h"
 #include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
 
@@ -119,7 +120,7 @@ void MemoryReportAnalyzer::ParseFileContent()
 		if (ContentLength > 0)
 		{
 			FString SectionContent = FileContent.Mid(ContentStart, ContentLength);
-			SectionData Section(SectionID, SectionContent);
+			TSharedPtr<SectionData> Section = CreateSpecializedSection(SectionID, SectionContent);
 			Sections.Add(Section);
 			
 			UE_LOG(LogTemp, Log, TEXT("Parsed section '%s': %d characters"), *SectionID, SectionContent.Len());
@@ -135,3 +136,30 @@ void MemoryReportAnalyzer::ParseFileContent()
 	
 	UE_LOG(LogTemp, Log, TEXT("Parsing complete: %d sections extracted"), Sections.Num());
 }
+
+TSharedPtr<SectionData> MemoryReportAnalyzer::CreateSpecializedSection(const FString& SectionID, const FString& SectionContent)
+{
+	TSharedPtr<SectionData> Section;
+
+	// Remove parentheses from SectionID if they exist
+	FString InternalSectionID = SectionID.Replace(TEXT("\""), TEXT(""));
+	
+	// Create specialized section based on section ID
+	if (InternalSectionID == TEXT("ConfigMem"))
+	{
+		// Create ConfigMem specialized section
+		TSharedPtr<ConfigMemSectionData> ConfigMemSection = MakeShareable(new ConfigMemSectionData(InternalSectionID, SectionContent));
+		ConfigMemSection->ExtractContentInternally();
+		Section = ConfigMemSection;
+		
+		UE_LOG(LogTemp, Log, TEXT("Created specialized ConfigMem section with %d entries"), ConfigMemSection->ConfigMemEntries.Num());
+	}
+	else
+	{
+		// Create generic section for unknown types
+		Section = MakeShareable(new SectionData(InternalSectionID, SectionContent));
+	}
+	
+	return Section;
+}
+
