@@ -134,6 +134,12 @@ void SMemoryReportFileVisualizerWidget::Construct(const FArguments& InArgs)
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.AutoWrapText(true)
 				]
+				+ SScrollBox::Slot()
+				.Padding(5)
+				[
+					SAssignNew(ConfigMemWidget, SMemoryReportConfigMemWidget)
+					.Visibility(EVisibility::Collapsed)
+				]
 			]
 		]
 	];
@@ -423,7 +429,14 @@ void SMemoryReportFileVisualizerWidget::UpdateContentDisplay()
 		return;
 	}
 	
+	// Hide all specialized widgets by default
+	if (ConfigMemWidget.IsValid())
+	{
+		ConfigMemWidget->SetVisibility(EVisibility::Collapsed);
+	}
+	
 	FString ContentToDisplay;
+	bool bUseSpecializedWidget = false;
 	
 	if (*SelectedSection == TEXT("Show All"))
 	{
@@ -443,18 +456,43 @@ void SMemoryReportFileVisualizerWidget::UpdateContentDisplay()
 		{
 			if (Section.IsValid() && Section->ID == *SelectedSection)
 			{
-				ContentToDisplay = Section->Content;
+				// Check if this is a ConfigMem section
+				TSharedPtr<ConfigMemSectionData> ConfigMemSection = StaticCastSharedPtr<ConfigMemSectionData>(Section);
+				if (ConfigMemSection.IsValid() && *SelectedSection == TEXT("ConfigMem"))
+				{
+					// Use specialized ConfigMem widget
+					if (ConfigMemWidget.IsValid())
+					{
+						ConfigMemWidget->Populate(ConfigMemSection);
+						ConfigMemWidget->SetVisibility(EVisibility::Visible);
+						bUseSpecializedWidget = true;
+					}
+				}
+				else
+				{
+					// Use regular text display
+					ContentToDisplay = Section->Content;
+				}
 				break;
 			}
 		}
 		
-		if (ContentToDisplay.IsEmpty())
+		if (ContentToDisplay.IsEmpty() && !bUseSpecializedWidget)
 		{
 			ContentToDisplay = TEXT("Section not found or empty.");
 		}
 	}
 	
-	ContentText->SetText(FText::FromString(ContentToDisplay));
+	// Show/hide text content based on whether we're using a specialized widget
+	if (bUseSpecializedWidget)
+	{
+		ContentText->SetVisibility(EVisibility::Collapsed);
+	}
+	else
+	{
+		ContentText->SetVisibility(EVisibility::Visible);
+		ContentText->SetText(FText::FromString(ContentToDisplay));
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

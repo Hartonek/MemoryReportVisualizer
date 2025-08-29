@@ -8,6 +8,7 @@
 #include "Input/DragAndDrop.h"
 #include "DragAndDrop/DecoratedDragDropOp.h"
 #include "Logic/MemoryReportAnalyzer.h"
+#include "Widgets/MemoryReportConfigMemWidget.h"
 
 class MEMORYREPORTVISUALIZER_API SMemoryReportFileVisualizerWidget : public SCompoundWidget
 {
@@ -44,6 +45,7 @@ private:
 	TSharedPtr<SOverlay> StatusOverlay;
 	TSharedPtr<class SComboBox<TSharedPtr<FString>>> SectionComboBox;
 	TSharedPtr<SBorder> SectionSelectionArea;
+	TSharedPtr<SMemoryReportConfigMemWidget> ConfigMemWidget;
 	TArray<TSharedPtr<FString>> SectionOptions;
 	TSharedPtr<FString> SelectedSection;
 	MemoryReportAnalyzer Analyzer;
