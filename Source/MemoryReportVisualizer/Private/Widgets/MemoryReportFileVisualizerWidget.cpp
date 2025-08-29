@@ -379,18 +379,18 @@ void SMemoryReportFileVisualizerWidget::PopulateSectionDropdown()
 	// Add "Show All" option
 	SectionOptions.Add(MakeShareable(new FString(TEXT("Show All"))));
 	
-	// Add header option if exists
+	// Add header option if exists and has content
 	const FString& Header = Analyzer.GetHeader();
 	if (!Header.IsEmpty())
 	{
 		SectionOptions.Add(MakeShareable(new FString(TEXT("Header"))));
 	}
 	
-	// Add each section ID
+	// Add each section ID (only if section has content)
 	const TArray<SectionData>& Sections = Analyzer.GetSections();
 	for (const SectionData& Section : Sections)
 	{
-		if (!Section.ID.IsEmpty())
+		if (!Section.ID.IsEmpty() && !Section.Content.IsEmpty())
 		{
 			SectionOptions.Add(MakeShareable(new FString(Section.ID)));
 		}
