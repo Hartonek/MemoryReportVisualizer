@@ -146,6 +146,12 @@ void SMemoryReportFileVisualizerWidget::Construct(const FArguments& InArgs)
 					SAssignNew(ResourceSizeSortWidget, SMemoryReportResourceSizeSortWidget)
 					.Visibility(EVisibility::Collapsed)
 				]
+				+ SScrollBox::Slot()
+				.Padding(5)
+				[
+					SAssignNew(RHIMemoryDumpWidget, SMemoryReportRHIMemoryDumpWidget)
+					.Visibility(EVisibility::Collapsed)
+				]
 			]
 		]
 	];
@@ -444,6 +450,10 @@ void SMemoryReportFileVisualizerWidget::UpdateContentDisplay()
 	{
 		ResourceSizeSortWidget->SetVisibility(EVisibility::Collapsed);
 	}
+	if (RHIMemoryDumpWidget.IsValid())
+	{
+		RHIMemoryDumpWidget->SetVisibility(EVisibility::Collapsed);
+	}
 	
 	FString ContentToDisplay;
 	bool bUseSpecializedWidget = false;
@@ -494,8 +504,23 @@ void SMemoryReportFileVisualizerWidget::UpdateContentDisplay()
 					}
 					else
 					{
-						// Use regular text display
-						ContentToDisplay = Section->Content;
+						// Check if this is a RHIMemoryDump section
+						TSharedPtr<RHIMemoryDumpSectionData> RHIMemoryDumpSection = StaticCastSharedPtr<RHIMemoryDumpSectionData>(Section);
+						if (RHIMemoryDumpSection.IsValid() && *SelectedSection == TEXT("rhi.DumpMemory"))
+						{
+							// Use specialized RHIMemoryDump widget
+							if (RHIMemoryDumpWidget.IsValid())
+							{
+								RHIMemoryDumpWidget->Populate(RHIMemoryDumpSection);
+								RHIMemoryDumpWidget->SetVisibility(EVisibility::Visible);
+								bUseSpecializedWidget = true;
+							}
+						}
+						else
+						{
+							// Use regular text display
+							ContentToDisplay = Section->Content;
+						}
 					}
 				}
 				break;

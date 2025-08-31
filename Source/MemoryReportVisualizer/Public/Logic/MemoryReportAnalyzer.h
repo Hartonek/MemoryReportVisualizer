@@ -7,6 +7,7 @@
 #include "MemoryReportSectionData.h"
 #include "MemoryReportConfigMemSectionData.h"
 #include "MemoryReportResourceSizeSortSectionData.h"
+#include "MemoryReportRHIMemoryDumpSectionData.h"
 
 class MEMORYREPORTVISUALIZER_API MemoryReportAnalyzer
 {

@@ -3,6 +3,7 @@
 #include "Logic/MemoryReportAnalyzer.h"
 #include "Logic/MemoryReportConfigMemSectionData.h"
 #include "Logic/MemoryReportResourceSizeSortSectionData.h"
+#include "Logic/MemoryReportRHIMemoryDumpSectionData.h"
 #include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
 
@@ -163,6 +164,15 @@ TSharedPtr<SectionData> MemoryReportAnalyzer::CreateSpecializedSection(const FSt
 		Section = ResourceSizeSortSection;
 		
 		UE_LOG(LogTemp, Log, TEXT("Created specialized ResourceSizeSort section with %d entries"), ResourceSizeSortSection->ResourceSizeSortEntries.Num());
+	}
+	else if (InternalSectionID == TEXT("rhi.DumpMemory"))
+	{
+		// Create RHIMemoryDump specialized section
+		TSharedPtr<RHIMemoryDumpSectionData> RHIMemoryDumpSection = MakeShareable(new RHIMemoryDumpSectionData(InternalSectionID, SectionContent));
+		RHIMemoryDumpSection->ExtractContentInternally();
+		Section = RHIMemoryDumpSection;
+		
+		UE_LOG(LogTemp, Log, TEXT("Created specialized RHIMemoryDump section with %d entries"), RHIMemoryDumpSection->RHIMemoryDumpEntries.Num());
 	}
 	else
 	{

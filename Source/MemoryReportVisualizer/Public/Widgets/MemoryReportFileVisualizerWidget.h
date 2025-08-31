@@ -10,6 +10,7 @@
 #include "Logic/MemoryReportAnalyzer.h"
 #include "Widgets/MemoryReportConfigMemWidget.h"
 #include "Widgets/MemoryReportResourceSizeSortWidget.h"
+#include "Widgets/MemoryReportRHIMemoryDumpWidget.h"
 
 class MEMORYREPORTVISUALIZER_API SMemoryReportFileVisualizerWidget : public SCompoundWidget
 {
@@ -48,6 +49,7 @@ private:
 	TSharedPtr<SBorder> SectionSelectionArea;
 	TSharedPtr<SMemoryReportConfigMemWidget> ConfigMemWidget;
 	TSharedPtr<SMemoryReportResourceSizeSortWidget> ResourceSizeSortWidget;
+	TSharedPtr<SMemoryReportRHIMemoryDumpWidget> RHIMemoryDumpWidget;
 	TArray<TSharedPtr<FString>> SectionOptions;
 	TSharedPtr<FString> SelectedSection;
 	MemoryReportAnalyzer Analyzer;
